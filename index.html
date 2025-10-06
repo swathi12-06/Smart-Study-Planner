@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Study Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Smart Study Planner</h1>
+        <p class="lead">Plan study goals, get reminders & track progress — all locally saved.</p>
+      </div>
+      <div class="controls">
+        <button id="notifyRequest" class="btn small">Enable Reminders</button>
+        <button id="clearAll" class="btn ghost small">Clear All Data</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <!-- Left: form -->
+      <aside class="card fade-up">
+        <h3>Add / Edit Task</h3>
+        <form id="taskForm">
+          <input type="hidden" id="taskId">
+          <label>Title<input id="title" required placeholder="e.g. Read chapters 1-3"></label>
+          <label>Subject<input id="subject" placeholder="Math, Physics..."></label>
+          <label>Due date & time<input id="due" type="datetime-local"></label>
+          <div class="row">
+            <label style="flex:1">Duration (min)<input id="duration" type="number" min="0" placeholder="e.g. 60"></label>
+            <label style="width:120px">Priority
+              <select id="priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </label>
+          </div>
+          <label>Notes<textarea id="notes" placeholder="Optional notes..."></textarea></label>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button type="submit" class="btn">Save Task</button>
+            <button type="button" id="reset" class="btn ghost">Reset</button>
+          </div>
+          <p class="meta">Tasks are saved in your browser (localStorage).</p>
+        </form>
+      </aside>
+
+      <!-- Right: task board -->
+      <main>
+        <div class="card">
+          <div class="board-head">
+            <div>
+              <strong id="summary">0 tasks — 0 completed</strong>
+              <div class="meta">Upcoming: <span id="upcoming">—</span></div>
+            </div>
+            <div class="controls">
+              <div class="filters">
+                <select id="filter">
+                  <option value="all">All</option>
+                  <option value="today">Today</option>
+                  <option value="week">This week</option>
+                  <option value="high">High priority</option>
+                  <option value="incomplete">Incomplete</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="tasks" id="tasks"></div>
+
+          <div class="timeline">
+            <h4>Visual Timeline (by due date)</h4>
+            <div class="timeline-track" id="timeline"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
