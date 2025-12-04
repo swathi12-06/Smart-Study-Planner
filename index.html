@@ -3,90 +3,128 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Study Planner</title>
+  <title>FocusFlow - Study Smarter</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#a78bfa">
+  <link rel="icon" href="https://via.placeholder.com/192x192/a78bfa/ffffff?text=FF" />
 </head>
 <body>
+  <div class="bg-gradient"></div>
 
-  <button id="themeToggle" class="theme-btn">🌙</button>
+  <button id="themeToggle" class="theme-btn">Moon</button>
 
   <div class="app">
-    <header>
-      <div>
-        <h1>Smart Study Planner</h1>
-        <p class="lead">Plan study goals, get reminders & track progress.</p>
-      </div>
-      <div class="controls">
-        <input id="searchBox" class="search" placeholder="Search tasks...">
-        <select id="sort">
-          <option value="date">Sort by Due Date</option>
-          <option value="priority">Sort by Priority</option>
-          <option value="alpha">Sort A-Z</option>
-        </select>
-        <button id="clearAll" class="btn ghost small">Clear All</button>
+    <header class="hero-header glass">
+      <h1>FocusFlow</h1>
+      <p>Master your studies. One pomodoro at a time.</p>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="streakCount">0</div>
+          <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="weeklyMins">0</div>
+          <div class="stat-label">Minutes This Week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="completedToday">0</div>
+          <div class="stat-label">Done Today</div>
+        </div>
       </div>
     </header>
 
+    <div class="quote-card glass">
+      <blockquote id="quoteText">"Loading your daily fire..."</blockquote>
+      <cite id="quoteAuthor">— FocusFlow</cite>
+    </div>
+
+    <div class="controls">
+      <input type="text" id="searchBox" placeholder="Search tasks..." />
+      <select id="sort">
+        <option value="Due Date">Due Date</option>
+        <option value="Priority">Priority</option>
+        <option value="A-Z" selected>A-Z</option>
+      </select>
+      <button id="clearAll" class="btn danger">Clear All</button>
+    </div>
+
     <div class="layout">
-      <aside class="card fade-up">
-        <h3>Add / Edit Task</h3>
+      <aside class="form-card glass">
+        <h2>Add New Task</h2>
         <form id="taskForm">
           <input type="hidden" id="taskId">
+          <label>Title <span style="color:#ef4444">*</span></label>
+          <input type="text" id="title" required placeholder="e.g., Finish Physics Chapter 8">
 
-          <label>Title<input id="title" required></label>
-          <label>Subject<input id="subject"></label>
-          <label>Due date & time<input id="due" type="datetime-local"></label>
+          <label>Subject (optional)</label>
+          <input type="text" id="subject" placeholder="e.g., Physics">
+
+          <label>Due Date & Time</label>
+          <input type="datetime-local" id="due">
 
           <div class="row">
-            <label style="flex:1">Duration (min)
-              <input id="duration" type="number">
-            </label>
-
-            <label style="width:120px">Priority
+            <div>
+              <label>Duration (minutes)</label>
+              <input type="number" id="duration" min="1" value="25" placeholder="25">
+            </div>
+            <div>
+              <label>Priority</label>
               <select id="priority">
                 <option value="low">Low</option>
                 <option value="medium" selected>Medium</option>
                 <option value="high">High</option>
               </select>
-            </label>
+            </div>
           </div>
 
-          <label>Notes<textarea id="notes"></textarea></label>
+          <label>Notes (optional)</label>
+          <textarea id="notes" rows="3" placeholder="Extra details, links, etc..."></textarea>
 
-          <label>Progress
-            <input id="progress" type="range" min="0" max="100" value="0">
-          </label>
+          <label>Progress <span id="progressValue">0%</span></label>
+          <input type="range" id="progress" min="0" max="100" value="0" class="slider">
 
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <button type="submit" class="btn">Save Task</button>
-            <button id="reset" type="button" class="btn ghost">Reset</button>
+          <div class="btn-group">
+            <button type="submit" class="btn primary">Save Task</button>
+            <button type="button" id="resetForm" class="btn secondary">Reset</button>
           </div>
         </form>
       </aside>
 
       <main>
-        <div class="card">
-          <div class="board-head">
+        <div class="tasks-card glass">
+          <div class="board-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
             <strong id="summary">0 tasks</strong>
-
-            <div>
-              <select id="filter">
-                <option value="all">All</option>
-                <option value="today">Today</option>
-                <option value="week">This week</option>
-                <option value="high">High priority</option>
-                <option value="completed">Completed</option>
-                <option value="incomplete">Incomplete</option>
-              </select>
-            </div>
+            <select id="filter">
+              <option value="all">All Tasks</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="overdue">Overdue</option>
+              <option value="high">High Priority</option>
+              <option value="completed">Completed</option>
+            </select>
           </div>
-
-          <div class="tasks" id="tasks"></div>
+          <div id="tasks" class="tasks"></div>
         </div>
       </main>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <div id="focusMode" class="focus-overlay hidden">
+    <div class="focus-card glass">
+      <h2 id="focusTitle">Task Title</h2>
+      <p id="focusSubject" style="opacity:0.8; margin-bottom:20px;">Subject</p>
+      <div class="timer-display" id="timerDisplay">25:00</div>
+      <div class="timer-controls" style="margin:30px 0; display:flex; gap:15px; justify-content:center;">
+        <button id="timerStart" class="btn primary large">Start Pomodoro</button>
+        <button id="timerStop" class="btn secondary">Stop</button>
+      </div>
+      <button id="closeFocus" class="btn ghost">Exit Focus Mode</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
