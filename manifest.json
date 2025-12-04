@@ -1,0 +1,13 @@
+{
+  "name": "FocusFlow Study Planner",
+  "short_name": "FocusFlow",
+  "description": "Beautiful offline study planner with Pomodoro & motivation",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#a78bfa",
+  "icons": [
+    { "src": "https://via.placeholder.com/192x192/a78bfa/ffffff?text=FF", "sizes": "192x192", "type": "image/png" },
+    { "src": "https://via.placeholder.com/512x512/a78bfa/ffffff?text=FF", "sizes": "512x512", "type": "image/png" }
+  ]
+}
