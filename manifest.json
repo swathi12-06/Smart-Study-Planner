@@ -1,7 +1,7 @@
 {
   "name": "FocusFlow Study Planner",
   "short_name": "FocusFlow",
-  "description": "Beautiful offline study planner with Pomodoro & motivation",
+  "description": "Beautiful offline study planner with Pomodoro, calendar, analytics & reminders",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0f172a",
