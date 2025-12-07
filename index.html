@@ -3,128 +3,230 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FocusFlow - Study Smarter</title>
+  <title>FocusFlow - Smart Study Planner</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#a78bfa">
-  <link rel="icon" href="https://via.placeholder.com/192x192/a78bfa/ffffff?text=FF" />
+  <link rel="icon" href="favicon.ico" />
+  <!-- Cloud Icon (Bootstrap Icons CDN) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+  <style>
+    /* Download Animation */
+    .download-animate {
+      animation: pulseGlow 0.6s ease-out;
+    }
+    @keyframes pulseGlow {
+      0% { transform: scale(1); box-shadow: 0 0 0px rgba(167,139,250,0.8); }
+      50% { transform: scale(1.08); box-shadow: 0 0 20px rgba(167,139,250,0.9); }
+      100% { transform: scale(1); box-shadow: 0 0 0px rgba(167,139,250,0.8); }
+    }
+  </style>
 </head>
+
 <body>
+
   <div class="bg-gradient"></div>
 
-  <button id="themeToggle" class="theme-btn">Moon</button>
+  <button id="themeToggle" class="theme-btn" title="Toggle theme">🌙</button>
 
-  <div class="app">
-    <header class="hero-header glass">
-      <h1>FocusFlow</h1>
-      <p>Master your studies. One pomodoro at a time.</p>
+  <header class="hero-header">
+    <h1>FocusFlow</h1>
+    <p>"Discipline is choosing between what you want now and what you want most."</p>
+    <cite>— Unknown</cite>
 
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value" id="streakCount">0</div>
-          <div class="stat-label">Day Streak</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="weeklyMins">0</div>
-          <div class="stat-label">Minutes This Week</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value" id="completedToday">0</div>
-          <div class="stat-label">Done Today</div>
-        </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div id="streakCount" class="stat-value">0</div>
+        <div class="stat-label">Day Streak</div>
       </div>
-    </header>
+      <div class="stat-card">
+        <div id="weeklyMins" class="stat-value">0</div>
+        <div class="stat-label">Weekly Minutes</div>
+      </div>
+      <div class="stat-card">
+        <div id="completedToday" class="stat-value">0</div>
+        <div class="stat-label">Completed Today</div>
+      </div>
+    </div>
 
     <div class="quote-card glass">
-      <blockquote id="quoteText">"Loading your daily fire..."</blockquote>
-      <cite id="quoteAuthor">— FocusFlow</cite>
+      <blockquote id="quoteText">"Your future is created by what you do today"</blockquote>
+      <cite id="quoteAuthor">— Unknown</cite>
+    </div>
+  </header>
+
+  <div class="controls">
+
+    <input id="searchBox" placeholder="Search tasks..." />
+
+    <select id="sort">
+      <option>A-Z</option>
+      <option>Due Date</option>
+      <option>Priority</option>
+    </select>
+
+    <select id="filter">
+      <option value="all">All Tasks</option>
+      <option value="today">Today</option>
+      <option value="week">This Week</option>
+      <option value="overdue">Overdue</option>
+      <option value="high">High Priority</option>
+      <option value="completed">Completed</option>
+    </select>
+
+    <button id="clearAll" class="btn danger">Clear All</button>
+
+    <button id="exportBtn" class="btn secondary" title="Download tasks">
+      <i class="bi bi-cloud-arrow-down"></i> Download
+    </button>
+
+    <button id="importBtn" class="btn secondary" title="Upload tasks">
+      <i class="bi bi-cloud-arrow-up"></i> Upload
+    </button>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="importFile" accept="application/json" style="display:none" />
+
+    <!-- Sound toggle -->
+    <label class="sound-toggle">
+      <input type="checkbox" id="soundToggle" checked /> Sound
+    </label>
+
+    <!-- Weekly goal quick set -->
+    <div class="goal-ctrl">
+      <label for="weeklyGoalInput">Weekly Goal (min)</label>
+      <input id="weeklyGoalInput" type="number" min="0" value="300" />
     </div>
 
-    <div class="controls">
-      <input type="text" id="searchBox" placeholder="Search tasks..." />
-      <select id="sort">
-        <option value="Due Date">Due Date</option>
-        <option value="Priority">Priority</option>
-        <option value="A-Z" selected>A-Z</option>
-      </select>
-      <button id="clearAll" class="btn danger">Clear All</button>
-    </div>
+  </div>
 
-    <div class="layout">
-      <aside class="form-card glass">
-        <h2>Add New Task</h2>
-        <form id="taskForm">
-          <input type="hidden" id="taskId">
-          <label>Title <span style="color:#ef4444">*</span></label>
-          <input type="text" id="title" required placeholder="e.g., Finish Physics Chapter 8">
+  <main class="layout app">
+    <aside class="glass form-card">
+      <h2>Add / Edit Task</h2>
 
-          <label>Subject (optional)</label>
-          <input type="text" id="subject" placeholder="e.g., Physics">
+      <form id="taskForm">
+        <input type="hidden" id="taskId" />
 
-          <label>Due Date & Time</label>
-          <input type="datetime-local" id="due">
+        <label>Title *</label>
+        <input id="title" required autocomplete="off" placeholder="Study topic, e.g., Maths - Integration" />
 
-          <div class="row">
-            <div>
-              <label>Duration (minutes)</label>
-              <input type="number" id="duration" min="1" value="25" placeholder="25">
-            </div>
-            <div>
-              <label>Priority</label>
-              <select id="priority">
-                <option value="low">Low</option>
-                <option value="medium" selected>Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
+        <label>Subject</label>
+        <input id="subject" placeholder="e.g., Physics, CS, English" />
+
+        <label>Due Date & Time</label>
+        <input type="datetime-local" id="due" />
+
+        <div class="row">
+          <div>
+            <label>Duration (minutes)</label>
+            <input id="duration" type="number" min="5" max="1440" />
           </div>
-
-          <label>Notes (optional)</label>
-          <textarea id="notes" rows="3" placeholder="Extra details, links, etc..."></textarea>
-
-          <label>Progress <span id="progressValue">0%</span></label>
-          <input type="range" id="progress" min="0" max="100" value="0" class="slider">
-
-          <div class="btn-group">
-            <button type="submit" class="btn primary">Save Task</button>
-            <button type="button" id="resetForm" class="btn secondary">Reset</button>
-          </div>
-        </form>
-      </aside>
-
-      <main>
-        <div class="tasks-card glass">
-          <div class="board-head" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <strong id="summary">0 tasks</strong>
-            <select id="filter">
-              <option value="all">All Tasks</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="overdue">Overdue</option>
-              <option value="high">High Priority</option>
-              <option value="completed">Completed</option>
+          <div>
+            <label>Priority</label>
+            <select id="priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
             </select>
           </div>
-          <div id="tasks" class="tasks"></div>
         </div>
-      </main>
-    </div>
-  </div>
 
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Add notes, links, or emojis 👍"></textarea>
+
+        <label>Subtasks (one per line)</label>
+        <textarea id="subtasks" placeholder="Read chapter 1&#10;Solve 10 questions"></textarea>
+
+        <label>Progress (%)</label>
+        <input id="progress" type="range" min="0" max="100" value="0" />
+        <div id="progressValue">0%</div>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn primary" type="submit">Save Task</button>
+          <button id="cancelEdit" type="button" class="btn secondary">Cancel</button>
+        </div>
+      </form>
+    </aside>
+
+    <section class="glass" style="padding: 30px;">
+      <h2>
+        <span id="summary">0 tasks</span>
+      </h2>
+
+      <div id="tasks"></div>
+
+      <!-- Calendar (required by script) -->
+      <div class="calendar-wrapper" style="margin-top:18px;">
+        <div style="display:flex; gap:10px; align-items:center; justify-content:space-between;">
+          <div>
+            <button id="prevMonth" class="btn small">Prev</button>
+            <button id="nextMonth" class="btn small">Next</button>
+          </div>
+          <div id="calendarTitle" style="font-weight:600;"></div>
+          <div></div>
+        </div>
+        <div id="calendar" class="calendar-grid"></div>
+      </div>
+
+    </section>
+
+    <!-- Analytics panel -->
+    <aside class="glass" style="padding:20px;">
+      <h3>Analytics</h3>
+      <canvas id="weeklyChart" width="420" height="160"></canvas>
+      <canvas id="subjectChart" width="320" height="160" style="margin-top:18px;"></canvas>
+
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        <button id="regenCharts" class="btn secondary">Refresh Charts</button>
+        <button id="clearCompleted" class="btn danger">Clear Completed</button>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>Weekly Goal Progress</div>
+          <div id="goalLabel">0 / 300 min</div>
+        </div>
+        <div class="goal-bar"><div id="goalProgress" style="width:0%"></div></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Focus Mode Overlay -->
   <div id="focusMode" class="focus-overlay hidden">
     <div class="focus-card glass">
-      <h2 id="focusTitle">Task Title</h2>
-      <p id="focusSubject" style="opacity:0.8; margin-bottom:20px;">Subject</p>
-      <div class="timer-display" id="timerDisplay">25:00</div>
-      <div class="timer-controls" style="margin:30px 0; display:flex; gap:15px; justify-content:center;">
-        <button id="timerStart" class="btn primary large">Start Pomodoro</button>
+      <h2 id="focusTitle"></h2>
+      <p id="focusSubject"></p>
+
+      <div id="timerDisplay" class="timer-display">25:00</div>
+
+      <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <button id="timerStart" class="btn primary">Start Pomodoro</button>
         <button id="timerStop" class="btn secondary">Stop</button>
+        <button id="closeFocus" class="btn danger">Close</button>
       </div>
-      <button id="closeFocus" class="btn ghost">Exit Focus Mode</button>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="script.js" defer></script>
+  <!-- Quick Add floating -->
+  <button id="quickAdd" class="floating-btn" title="Quick add task">＋</button>
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <!-- Main Script -->
+  <script src="script.js"></script>
+
+  <!-- Download Animation Script -->
+  <script>
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const btn = document.getElementById("exportBtn");
+      btn.classList.add("download-animate");
+      setTimeout(() => btn.classList.remove("download-animate"), 600);
+    });
+    document.getElementById("importBtn").addEventListener("click", () => {
+      document.getElementById('importFile').click();
+    });
+  </script>
+
 </body>
 </html>
